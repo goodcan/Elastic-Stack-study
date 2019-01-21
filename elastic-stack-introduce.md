@@ -1,4 +1,4 @@
-## Elastic Stack
+## Elastic Stack 介绍
 
 ### 同类型产品对比
 > 对比 Hadoop、Spark、Storm、Hive，主要的特点是快、快、快！
