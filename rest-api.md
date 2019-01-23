@@ -11,3 +11,5 @@
 
 ### 索引 API
 - es 有转梦的 Index API，用于创建、更新、删除索引配置等
+    - 创建索引 api : PUT /index\_name
+    - 删除索引 api : DELETE /index\_name
