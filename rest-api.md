@@ -100,9 +100,86 @@ POST /demo/doc
   "_primary_term" : 1
 }
 ```
+##### 批量创建文档
+> 格式：POST /\_bulk http-body  
+> es 允许一次创建多个文档，从而减少网络传输开销提升写入速率  
+> <font color="#dd0000">\_bulk 要求每个 json 串不能换行</font>
+
+```
+# request
+# action_type: index、update、create、delete
+# index 和 create 都是创建，create 在创建时如果已经存在则会报错，index 会覆盖原文档
+# _bulk 中每个 json 数据不能为空
+POST /_bulk
+{"index":{"_index":"demo","_type":"doc","_id":"3"}}
+{"usernae":"demo_3","age":3}
+{"delete":{"_index":"demo","_type":"doc","_id":"1"}}
+{"update":{"_index":"demo","_type":"doc","_id":"2"}}
+{"doc":{"age":20}}
+
+# response
+{
+  "took" : 170,
+  "errors" : false,
+  "items" : [
+    {
+      "index" : {
+        "_index" : "demo",
+        "_type" : "doc",
+        "_id" : "3",
+        "_version" : 1,
+        "result" : "created",
+        "_shards" : {
+          "total" : 2,
+          "successful" : 1,
+          "failed" : 0
+        },
+        "_seq_no" : 0,
+        "_primary_term" : 4,
+        "status" : 201
+      }
+    },
+    {
+      "delete" : {
+        "_index" : "demo",
+        "_type" : "doc",
+        "_id" : "1",
+        "_version" : 3,
+        "result" : "deleted",
+        "_shards" : {
+          "total" : 2,
+          "successful" : 1,
+          "failed" : 0
+        },
+        "_seq_no" : 2,
+        "_primary_term" : 4,
+        "status" : 200
+      }
+    },
+    {
+      "update" : {
+        "_index" : "demo",
+        "_type" : "doc",
+        "_id" : "2",
+        "_version" : 2,
+        "result" : "updated",
+        "_shards" : {
+          "total" : 2,
+          "successful" : 1,
+          "failed" : 0
+        },
+        "_seq_no" : 1,
+        "_primary_term" : 4,
+        "status" : 200
+      }
+    }
+  ]
+}
+
+```
 
 #### 查询文档
-##### 指定文档 di 查询
+##### 指定文档 id 查询
 > 格式：GET /index-name/type-name/id-name  
 > \_source 存储原始数据
 
@@ -215,5 +292,51 @@ GET /demo/doc/_search
       }
     ]
   }
+}
+```
+
+##### 批量查询文档
+> 格式：GET /\_mget http-body
+> es 允许查询多个文档
+
+```
+# request
+GET /_mget
+{
+  "docs": [
+    {
+      "_index": "demo",
+      "_type": "doc",
+      "_id": "1"
+    },
+    {
+      "_index": "demo",
+      "_type": "doc",
+      "_id": "2"
+    }
+  ]
+}
+
+# response
+{
+  "docs" : [
+    {
+      "_index" : "demo",
+      "_type" : "doc",
+      "_id" : "1",
+      "found" : false
+    },
+    {
+      "_index" : "demo",
+      "_type" : "doc",
+      "_id" : "2",
+      "_version" : 2,
+      "found" : true,
+      "_source" : {
+        "username" : "dome_2",
+        "age" : 20
+      }
+    }
+  ]
 }
 ```
